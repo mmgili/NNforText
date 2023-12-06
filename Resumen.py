@@ -19,25 +19,24 @@ for elem in archivo:
 
 sents_list = [x for x in sents if 'Marcelo' in x]
 
+##summarizer = pipeline("summarization", model="Falconsai/text_summarization")
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 salida_ok = False
 start_block = 0
-len_text = 50 #len(sents_list)
+len_text = 18 #len(sents_list)
 
 ##resumir, recortar texto si no alcanza la memoria
-while Tue:
-    while not salida_ok:
-        try:
-            resumen = summarizer(''.join(sents_list[start_block:start_block + len_text]), max_length=600, 
-                min_length=30, do_sample=False)
-            start_block = len_text + start_block
-            len_text = 50
-            break
-        except (MemoryError, IndexError):
-            print (f"Error - {start_block} - {len_text}")
-            len_text = len_text - 2
-
 with open(r'C:\Users\Mariano\Documents\Temp\salida_resumen.txt', 'w', encoding="utf-8") as f:
-    f.write(resumen[0]['summary_text'])
+	while not (start_block >= len(sents_list)) or start_block > 200:
+		try:
+			resumen = summarizer(''.join(sents_list[start_block:start_block + len_text]), max_new_tokens=40, do_sample=False)
+			f.write(resumen[0]['summary_text'] + "\n")
+		except (MemoryError, IndexError):
+			print (f"Error - {start_block} - {len_text}")
+			len_text = len_text - 2
+		else:
+			start_block = len_text + start_block
+			len_text = 50
+
 
