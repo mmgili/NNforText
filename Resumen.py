@@ -17,26 +17,24 @@ for elem in archivo:
         else:
             sents.append(elem)
 
-sents_list = [x for x in sents if 'Marcelo' in x]
+sents_list = [x for x in sents if 'work' in x]
 
-##summarizer = pipeline("summarization", model="Falconsai/text_summarization")
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+summarizer = pipeline("summarization", model="Falconsai/text_summarization")
+##summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-salida_ok = False
-start_block = 0
-len_text = 18 #len(sents_list)
-
-##resumir, recortar texto si no alcanza la memoria
-with open(r'C:\Users\Mariano\Documents\Temp\salida_resumen.txt', 'w', encoding="utf-8") as f:
-	while not (start_block >= len(sents_list)) or start_block > 200:
+with open(r'C:\Users\Mariano\Documents\Temp\salida_resumen_falcon.txt', 'w', encoding="utf-8") as f:
+	for n, sent in enumerate(sents_list):
 		try:
-			resumen = summarizer(''.join(sents_list[start_block:start_block + len_text]), max_new_tokens=40, do_sample=False)
-			f.write(resumen[0]['summary_text'] + "\n")
+			if sent.count(" ") > 30:
+				resumen = summarizer(sent, min_length=20, max_length=45, do_sample=True)
+				f.write(resumen[0]['summary_text'] + "\n")
+				print("-----")
+				print(sent)
+				print(resumen[0]['summary_text'] + "\n")
+			else:
+				f.write(sent + "\n")
+				print("-----")
+				print(sent)
 		except (MemoryError, IndexError):
-			print (f"Error - {start_block} - {len_text}")
-			len_text = len_text - 2
-		else:
-			start_block = len_text + start_block
-			len_text = 50
-
+			print (f"Error - {len(sent)}")
 
